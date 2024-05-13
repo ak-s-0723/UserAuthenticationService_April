@@ -3,6 +3,7 @@ package org.example.userauthenticationservice_april.services;
 import org.example.userauthenticationservice_april.models.User;
 import org.example.userauthenticationservice_april.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -13,6 +14,9 @@ public class AuthService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
     public User signUp(String email, String password) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
         if(optionalUser.isPresent()) {
@@ -21,7 +25,7 @@ public class AuthService {
 
         User user = new User();
         user.setEmail(email);
-        user.setPassword(password);
+        user.setPassword(bCryptPasswordEncoder.encode(password));
         userRepository.save(user);
         return user;
     }
