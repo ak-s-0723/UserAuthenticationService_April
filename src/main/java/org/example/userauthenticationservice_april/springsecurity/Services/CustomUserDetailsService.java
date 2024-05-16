@@ -24,6 +24,14 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         if(userOptional.isEmpty()) return null;
 
-        return org.springframework.security.core.userdetails.User.withDefaultPasswordEncoder().username(userOptional.get().getEmail()).password(userOptional.get().getPassword()).build();
+        //In this case if BCryptPasswordEncoder will be there, it will get considered, otherwise
+        // we will not move from Login Page
+        //return new CustomUserDetails(userOptional.get());
+
+        //In this case, as it is string will be considered, whatever we provide on frontend
+        return org.springframework.security.core.userdetails.User
+                .withDefaultPasswordEncoder().username(userOptional.get().getEmail())
+                .password(userOptional.get().getPassword())
+                .build();
     }
 }

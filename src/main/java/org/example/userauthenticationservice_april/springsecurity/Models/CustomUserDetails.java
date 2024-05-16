@@ -1,7 +1,5 @@
 package org.example.userauthenticationservice_april.springsecurity.Models;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.example.userauthenticationservice_april.models.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
