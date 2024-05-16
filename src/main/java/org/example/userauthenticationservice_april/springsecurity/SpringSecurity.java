@@ -17,8 +17,8 @@ public class SpringSecurity {
         return  httpSecurity.build();
     }
 
-    @Bean
+    /*@Bean
     public BCryptPasswordEncoder getBcryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
-    }
+    }*/
 }

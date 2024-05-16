@@ -31,8 +31,8 @@ public class AuthService {
     @Autowired
     private SessionRepository sessionRepository;
 
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    /*@Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;*/
 
     public User signUp(String email, String password) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
@@ -42,7 +42,7 @@ public class AuthService {
 
         User user = new User();
         user.setEmail(email);
-        user.setPassword(bCryptPasswordEncoder.encode(password));
+        //user.setPassword(bCryptPasswordEncoder.encode(password));
         userRepository.save(user);
         return user;
     }
@@ -54,10 +54,10 @@ public class AuthService {
             return null;
         }
 
-        if(!bCryptPasswordEncoder.matches(password,
+       /* if(!bCryptPasswordEncoder.matches(password,
                 optionalUser.get().getPassword())) {
             return null;
-        }
+        }*/
 
         //TOKEN GENERATION
 
