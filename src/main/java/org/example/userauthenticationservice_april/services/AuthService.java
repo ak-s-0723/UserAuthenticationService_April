@@ -1,5 +1,7 @@
 package org.example.userauthenticationservice_april.services;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.MacAlgorithm;
 import org.antlr.v4.runtime.misc.Pair;
@@ -33,6 +35,9 @@ public class AuthService {
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
+    private SecretKey secretKey;
 
     public User signUp(String email, String password) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
@@ -75,15 +80,17 @@ public class AuthService {
         claims.put("email",optionalUser.get().getEmail());
         claims.put("roles",optionalUser.get().getRoleSet());
         long nowInMillis = System.currentTimeMillis();
-        claims.put("iat",new Date(nowInMillis));
-        claims.put("exp",new Date(nowInMillis+1000000));
+        claims.put("iat",nowInMillis);
+        claims.put("exp",nowInMillis+100000000L);  //10000 sec
 
 
 //        byte[] content = message.getBytes(StandardCharsets.UTF_8);
 
 
-        MacAlgorithm algorithm = Jwts.SIG.HS256;
-        SecretKey secretKey = algorithm.key().build();
+        //MacAlgorithm algorithm = Jwts.SIG.HS256;
+        //SecretKey secretKey = algorithm.key().build();
+
+        //secretKey.getAlgorithm().toString();
 
         String token = Jwts.builder().claims(claims).signWith(secretKey).compact();
 
@@ -98,5 +105,43 @@ public class AuthService {
         headers.add(HttpHeaders.SET_COOKIE,token);
 
         return new Pair<User,MultiValueMap<String,String>>(optionalUser.get(),headers);
+    }
+
+    public Boolean validateToken(String token,Long userId) {
+        //If you are getting email as input
+        //Go to user table and do findByEmail and
+        //from User , get Id and use below
+
+        Optional<Session> optionalSession = sessionRepository.findByTokenAndUser_Id(token,userId);
+
+        if(optionalSession.isEmpty()) {
+            System.out.println("User or Token not found");
+            return false;
+        }
+
+        JwtParser jwtParser = Jwts.parser().verifyWith(secretKey).build();
+        Claims claims = jwtParser.parseSignedClaims(token).getPayload();
+
+        long tokenExpiry = (Long)claims.get("exp");
+        long nowInMillis = System.currentTimeMillis();
+
+        if(nowInMillis > tokenExpiry) {
+            System.out.println(tokenExpiry);
+            System.out.println(nowInMillis);
+            System.out.println("Token Expired");
+            return false;
+        }
+
+        Optional<User> optionalUser  = userRepository.findById(userId);
+        String userEmail = optionalUser.get().getEmail();
+
+        if(!userEmail.equals(claims.get("email"))) {
+            System.out.println(userEmail);
+            System.out.println(claims.get("email"));
+            System.out.println("Emails didn't match");
+            return false;
+        }
+
+        return true;
     }
 }

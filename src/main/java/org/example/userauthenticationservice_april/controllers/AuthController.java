@@ -1,10 +1,7 @@
 package org.example.userauthenticationservice_april.controllers;
 
 import org.antlr.v4.runtime.misc.Pair;
-import org.example.userauthenticationservice_april.Dtos.LoginRequestDto;
-import org.example.userauthenticationservice_april.Dtos.LogoutRequestDto;
-import org.example.userauthenticationservice_april.Dtos.SignupRequestDto;
-import org.example.userauthenticationservice_april.Dtos.UserDto;
+import org.example.userauthenticationservice_april.Dtos.*;
 import org.example.userauthenticationservice_april.models.User;
 import org.example.userauthenticationservice_april.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +38,11 @@ public class AuthController {
         } catch (Exception exception) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @PostMapping("/validate")
+    public ResponseEntity<Boolean> validateToken(@RequestBody ValidateTokenRequestDto validateTokenRequestDto) {
+      return new ResponseEntity<>(authService.validateToken(validateTokenRequestDto.getToken(),validateTokenRequestDto.getUserId()),HttpStatus.OK);
     }
 
     @PostMapping("/logout")
