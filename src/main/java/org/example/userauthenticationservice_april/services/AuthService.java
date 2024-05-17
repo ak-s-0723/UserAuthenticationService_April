@@ -145,3 +145,10 @@ public class AuthService {
         return true;
     }
 }
+
+
+/*
+Credits to Devendra Gaupale for sharing this
+String secret = "ADGJK6758540GHJ665fsfs7";
+String token = Jwts.builder().claims(claims).signWith(SignatureAlgorithm.HS256,secret).compact();
+ */
