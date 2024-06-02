@@ -75,9 +75,14 @@ public class SecurityConfig {
     @Order(2)
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http)
             throws Exception {
+        //http.cors().disable();
+        //http.csrf().disable();
         http
                 .authorizeHttpRequests((authorize) -> authorize
+                        .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/users/**").permitAll()
                         .anyRequest().authenticated()
+                        //.anyRequest().permitAll()
                 )
                 // Form login handles the redirect to the login page from the
                 // authorization server filter chain
