@@ -26,7 +26,8 @@ public class AuthController {
             User user = authService.signUp(signupRequestDto.getEmail(), signupRequestDto.getPassword());
             return new ResponseEntity<>(getUserDto(user),HttpStatus.OK);
         }catch(Exception exception) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            //return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            throw exception;
         }
     }
 

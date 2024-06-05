@@ -1,10 +1,15 @@
 package org.example.userauthenticationservice_april.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.MacAlgorithm;
 import org.antlr.v4.runtime.misc.Pair;
+import org.example.userauthenticationservice_april.Dtos.EmailDto;
+import org.example.userauthenticationservice_april.Dtos.UserDto;
+import org.example.userauthenticationservice_april.clients.KafkaProducerClient;
 import org.example.userauthenticationservice_april.models.Session;
 import org.example.userauthenticationservice_april.models.SessionState;
 import org.example.userauthenticationservice_april.models.User;
@@ -39,9 +44,16 @@ public class AuthService {
     @Autowired
     private SecretKey secretKey;
 
-    public User signUp(String email, String password) {
+    @Autowired
+    private KafkaProducerClient kafkaProducerClient;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    public User signUp(String email, String password)  {
         Optional<User> optionalUser = userRepository.findByEmail(email);
         if(optionalUser.isPresent()) {
+            //return optionalUser.get();
             return null;
         }
 
@@ -49,8 +61,32 @@ public class AuthService {
         user.setEmail(email);
         user.setPassword(bCryptPasswordEncoder.encode(password));
         userRepository.save(user);
-        return user;
+
+        //SENDING MESSAGE IN KAFKA
+        //UserDto userDto = new UserDto();
+        //userDto.setEmail(email);
+        EmailDto emailDto = new EmailDto();
+        emailDto.setTo(email);
+        emailDto.setFrom("anuragbatch@gmail.com");
+        emailDto.setSubject("WELCOME TO SCALER");
+        emailDto.setBody("Have a good Learning Experience");
+        try {
+            kafkaProducerClient.sendMessage("sendEmail", objectMapper.writeValueAsString(emailDto));
+            return user;
+        }catch(JsonProcessingException ex) {
+            throw new RuntimeException(ex);
+        }
+
+        //return user;
     }
+
+//    Welcome To Scaler
+//    Wish you a good stay  -> Have  a good learning
+//    ordercreated    -> handleOrderCreation()
+//    ordercancelled 0> handleOrderCancellation()
+//            login -> handleLogin
+//    forgetpassword  ->
+//                    signup
 
     public Pair<User,MultiValueMap<String,String>> login(String email, String password) {
         Optional<User> optionalUser = userRepository.findByEmail(email);

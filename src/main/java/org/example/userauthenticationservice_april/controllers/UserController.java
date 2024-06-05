@@ -1,6 +1,6 @@
 package org.example.userauthenticationservice_april.controllers;
 
-import jakarta.ws.rs.Path;
+
 import org.example.userauthenticationservice_april.Dtos.UserDto;
 import org.example.userauthenticationservice_april.models.User;
 import org.example.userauthenticationservice_april.services.UserService;
